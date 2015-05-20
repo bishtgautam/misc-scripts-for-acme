@@ -1,10 +1,46 @@
 #!/bin/sh
+# Author: Gautam Bisht <gbisht@lbl.gov>
 
+display_usage(){
+  echo >&2 \
+  "usage: $0 [-a acme_src_dir | --acme_dir acme_source_dir] [-h|--help]"
+}
+
+acme_dir=
+
+# Get command line arguments
+if [  $# -le 1 ]
+then
+  display_usage
+  exit 1
+fi
+
+while [ $# -gt 0 ]
+do
+  case "$1" in
+    -a | --acme_dir ) acme_dir="$2"; shift;;
+    -h | --help ) display_usage; exit 1;;
+    -*) display_usage
+      exit 1;;
+    *)  break;;	# terminate while loop
+  esac
+  shift
+done
+
+# Check if ACME code directory is valid
+if [ ! -d "$acme_dir/scripts" ]; then
+  echo "ACME code directory does not exisit: " $acme_dir
+  exit 1
+fi
+
+# Set other variables regarding the case
 export RES=f19_g16
 export COMPSET=I1850CRUCLM45BGC
 export MAC=lawrencium-lr3
 export COMPILER=intel
-export CASE_NAME=${RES}.${COMPSET}.${MAC}.${COMPILER}.`date +"%Y-%m-%d"`
+export CASE_NAME=${RES}.${COMPSET}.${MAC}.${COMPILER}.`date +"%Y-%m-%d-%H-%M-%S"`
+
+cd ${acme_dir}/scripts
 
 ./create_newcase -case ${CASE_NAME} -res ${RES} -compset ${COMPSET} -mach ${MAC} -project acme -compiler ${COMPILER}
 
