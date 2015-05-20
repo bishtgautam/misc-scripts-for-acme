@@ -66,7 +66,6 @@ c66c8aa: Merge branch 'jgfouca/scripts/jenkins_dont_wait_if_nlonly' (PR #169)
 f8c16ce: Merge pull request #153 from ACME-Climate/ACME/daliwang/land/icase
 32c529c: Merge branch 'singhbalwinder/atm/add-demott-ice-nucleation'
 ...
-
 ```
 
 
@@ -157,7 +156,6 @@ cd ${BASE_DIR}/ACME-ckoven-fork/
 git remote -v
 git remote add acme-fork-git https://github.com/ACME-Climate/ACME.git
 git push acme-fork-git ckoven/lnd/clm-ed-branch
-
 
 ```
 
