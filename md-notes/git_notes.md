@@ -47,7 +47,6 @@ git clone git@github.com:ACME-Climate/ACME.git
 | * | 5b6d92b: Modified abortuils to cam_abortutils in three files
 | * | f4e1784: ADD DEMOTT ICE NUCLEATION SCHEME AND BUG FIXES
 | * | c64a6b0: Improve aerosol scavenging and resuspension [HD mods]
-
 ```
 
 ## View incoming commits
@@ -146,6 +145,9 @@ git remote -v
 git remote add acme-fork-local ${BASE_DIR}/ACME-fork
 git remote -v
 git push acme-fork-local ckoven/lnd/clm-ed-branch
+
+cd ${BASE_DIR}/ACME-fork
+git push origin +ckoven/lnd/clm-ed-branch
 ```
 
 * **One-step-method**: Push the changes from 'ckoven/lnd/clm-ed-branch' into a local copy of 
@@ -166,36 +168,41 @@ git push acme-fork-git ckoven/lnd/clm-ed-branch
 ### Generating baselines
 
 ```
+export GITHASH=`git log -n 1 --prety=%h`
+
+# Case directory:
+#   /project/projectdirs/acme/gbisht/tests/${GITHASH}-acme_developer
+# Baseline directory:
+#   /project/projectdirs/acme/gbisht/baselines/${GITHASH}-acme_developer
+
 ./create_test \
 -xml_mach edison \
 -xml_compiler intel \
 -xml_category acme_developer \
--testid acme_dev_bb1a6da \
--testroot /project/projectdirs/acme/gbisht/tests/bb1a6da-acme_developer \
+-testid acme_dev_${GITHASH} \
+-testroot /project/projectdirs/acme/gbisht/tests/${GITHASH}-acme_developer \
 -baselineroot /project/projectdirs/acme/gbisht/baselines \
--generate bb1a6da-acme_developer \
+-generate ${GITHASH}-acme_developer \
 -project acme
-
-# Case directory: /project/projectdirs/acme/gbisht/tests/bb1a6da-acme_developer
-# Baseline directory: /project/projectdirs/acme/gbisht/baselines/bb1a6da-acme_developer
-
 ```
 
 ### Comparing baselines
 
 ```
+export NEW_GITHASH=`git log -n 1 --prety=%h`
+export OLD_GITHASH=d97ef09
+# Case directory:
+#   /project/projectdirs/acme/gbisht/tests/${NEW_GITHASH}-acme_developer
+# Baseline directory:
+#   /project/projectdirs/acme/gbisht/baselines/${OLD_GITHASH}-acme_developer
+
 ./create_test \
 -xml_mach edison \
 -xml_compiler intel \
 -xml_category acme_developer \
--testid acme_dev_52b9226 \
--testroot /project/projectdirs/acme/gbisht/tests/52b9226-acme_developer \
+-testid acme_dev_${NEW_GITHASH} \
+-testroot /project/projectdirs/acme/gbisht/tests/${NEW_GITHASH}-acme_developer \
 -baselineroot /project/projectdirs/acme/gbisht/baselines \
--compare d97ef09-acme_developer \
+-compare ${OLD_GITHASH}-acme_developer \
 -project acme
-
-# Case directory: /project/projectdirs/acme/gbisht/tests/52b9226-acme_developer
-# Baseline directory: /project/projectdirs/acme/gbisht/baselines/d97ef09-acme_developer
-
 ```
-~~~~
