@@ -19,6 +19,13 @@ function CreateCLMUgridSurfdatForCLM45(lati_region, long_region, ...
 fname_out = sprintf('%s/surfdata_%s_%s.nc',out_netcdf_dir,clm_usrdat_name,datestr(now, 'cyymmdd'));
 disp(['  surface_dataset: ' fname_out])
 
+% Check if the file is available
+[s,~]=system(['ls ' clm_gridded_surfdata_filename]);
+
+if (s ~= 0)
+   error(['File not found: ' clm_gridded_surfdata_filename]);
+end
+
 ncid_inp = netcdf.open(clm_gridded_surfdata_filename,'NC_NOWRITE');
 ncid_out = netcdf.create(fname_out,'NC_CLOBBER');
 
