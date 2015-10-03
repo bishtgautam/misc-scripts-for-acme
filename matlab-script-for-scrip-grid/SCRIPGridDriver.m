@@ -4,7 +4,7 @@
 % Gautam Bisht (gbisht@lbl.gov)
 % 09-30-2015
 % +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-function SCRIPridDriver(cfg_fname)
+function SCRIPGridDriver(cfg_fname)
 
 % To get access to CreateCLMUgridDomainForCLM45.m
 addpath ../matlab-script-for-sparse-grid/
