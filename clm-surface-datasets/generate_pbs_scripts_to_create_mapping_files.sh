@@ -7,8 +7,9 @@ res_name=
 grid_type=global
 run_dir=./
 queue=regular
-walltime=04:00:00
+walltime=02:00:00
 mach=edison
+user_email=
 
 # Get command line arguments
 while [ $# -gt 0 ]
@@ -21,6 +22,7 @@ do
     -q | --queue      ) queue="$2";     shift;;
     -w | --walltime   ) walltime="$2";  shift;;
     --res_name        ) res_name="$2";  shift;;
+    -e | --email      ) user_email="$2";  shift;;
     -*) echo >&2 \
       "usage: $0 [-a|--acme_dir] <dir> [-g|--grid_file] <file.nc> [-t|--grid_type] <regional/global>" \
       " [-r|--run_dir] <dir> [-q] <debug/regular> [-w|--walltime] <hh:mm:ss> --res_name <name>"
@@ -31,20 +33,20 @@ do
 done
 
 # Check if ACME code directory is valid
-if [ ! -d "$acme_dir/scripts" ]; then
-  echo "ACME code directory does not exisit: " $acme_dir
+if [ ! -d "$acme_dir" ]; then
+  echo "ACME code directory does not exist: " $acme_dir
   exit 1
 fi
 
 # Check if run directory is valid
 if [ ! -d "$run_dir" ]; then
-  echo "Run directory does not exisit: " $run_dir
+  echo "Run directory does not exist: " $run_dir
   exit 1
 fi
 
 # Check if the grid file exists
 if [ ! -f "$grid_file" ]; then
-  echo "Grid file directory does not exisit: " $grid_file
+  echo "Grid file directory does not exist: " $grid_file
   exit 1
 fi
 
@@ -76,8 +78,8 @@ case "$mach" in
      module load ncl/6.1.1
      module load /global/project/projectdirs/ccsm1/modulefiles/edison/esmf/6.3.0rp1-ncdfio-mpi-O
      export ESMFBIN_PATH=/project/projectdirs/ccsm1/esmf/edison/ESMF-6.3.0rp1intel14.0_netcdf4.1.3-O/bin
-     export REGRID_PROC=48
-     export MPIEXEC="aprun -n ${REGRID_PROC} "
+     export REGRID_PROC=8
+     export MPIEXEC="srun -n ${REGRID_PROC} "
      export CSMDATA=/project/projectdirs/ccsm1/inputdata
      ;;
    *)
@@ -88,7 +90,8 @@ esac
 
 pwd=$PWD
 
-cd ${acme_dir}/models/lnd/clm/tools/shared/mkmapdata
+#cd ${acme_dir}/models/lnd/clm/tools/shared/mkmapdata
+cd ${acme_dir}/components/clm/tools/shared/mkmapdata
 
 ./mkmapdata.sh           \
 --gridfile ${grid_file}  \
@@ -134,25 +137,25 @@ do
     map_id=${ii}
   fi 
 
-  filename=${res_name}.map_${map_id}.pbs
+  filename=${res_name}.map_${map_id}.run
   rm -f ${filename}
 
   cat >> ${filename} << EOF
-#PBS -A acme
-#PBS -q ${QUEUE}
-#PBS -l mppwidth=48
-#PBS -l walltime=${WALLTIME}
-#PBS -N ${res_name}.map_${map_id}
-#PBS -j oe 
-#PBS -m abe
-#PBS -M gbisht@lbl.gov
+#!/bin/sh
+#SBATCH  --account=acme
+#SBATCH  --partition=${QUEUE}
+#SBATCH  --nodes=2
+#SBATCH  --time=${WALLTIME}
+#SBATCH  --job-name=${res_name}.map_${map_id}
+#SBATCH  --mail-type=all
+#SBATCH  --mail-user=${user_email}
 
 module load nco/4.3.8
 module load ncl/6.1.1
 
-cd $RUNDIR
+cd $run_dir
 
-CDATE="c"\`date +%y%m%d\`
+CDATE=$CDATE
 
 EOF
 
@@ -161,8 +164,8 @@ EOF
   hydro1k_pbs=`cat ${filename}  | grep HYDRO1K | wc -l`
   if [ $hydro1k_pbs -gt 0 ]
   then
-    perl -w -i -p -e 's@mppwidth=48@mppwidth=960@' ${filename}
-    perl -w -i -p -e 's@aprun -n 48@ aprun -n 48 -S 1@' ${filename}
+    perl -w -i -p -e 's@nodes=2@nodes=40@' ${filename}
+    perl -w -i -p -e 's@srun -n 8@ srun -n 40 @' ${filename}
     perl -w -i -p -e 's@--netcdf4@--64bit_offset@' ${filename}
   fi
 
