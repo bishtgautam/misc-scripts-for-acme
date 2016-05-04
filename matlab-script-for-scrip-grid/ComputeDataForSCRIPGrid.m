@@ -28,8 +28,8 @@ grid_corner_lat = zeros(grid_size, grid_corners);
 grid_corner_lon = zeros(grid_size, grid_corners);
 
 count = 0;
-for jj = 1:nlat
-    for ii = 1:nlon
+for jj = 1:nlon
+    for ii = 1:nlat
         count = count + 1;
         grid_center_lat(count,1) = latc(ii);
         grid_center_lon(count,1) = lonc(jj);
