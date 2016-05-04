@@ -32,7 +32,7 @@ if (s ~= 0)
 end
 
 ncid_inp = netcdf.open(clm_gridded_domain_filename,'NC_NOWRITE');
-ncid_out = netcdf.create(fname_out,'NC_CLOBBER');
+ncid_out = netcdf.create(fname_out,'64BIT_OFFSET');
 
 info_inp = ncinfo(clm_gridded_domain_filename);
 
