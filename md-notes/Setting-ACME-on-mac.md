@@ -119,7 +119,7 @@ cd $CASE_NAME
 
 ```
 
-- Modify env\_mach_pes.xmlodi
+- Modify env\_mach_pes.xml
 
 - Modify env\_build.xml
 
